@@ -79,28 +79,29 @@ namespace DeadCellsStats {
 
 		// Called when the 'run.dat' file is deleted
 		static void OnDeleted(object sender, FileSystemEventArgs e) {
-			Console.WriteLine("Current run has ended.");
-			Console.WriteLine("Waiting for a new run to start...");
+			Console.WriteLine("File run.dat has been deleted.");
 		}
 
 		// Called when the 'run.dat' file is created
 		static void OnCreated(object sender, FileSystemEventArgs e) {
-			Console.WriteLine("Run started!");
+			Console.WriteLine("File run.dat has been created.");
 		}
 
 		// Called when the 'run.dat' file is modified (new zone)
 		static void OnChanged(object sender, FileSystemEventArgs e) {
 			if(isSaveAlreadyDone) {
 				return;
-			} else {
-				isSaveAlreadyDone = true;
-				Task.Run(() => ResetSaveTimer(5000));
 			}
 
-			string tempFileName = Globals.RunFilePath + DateTime.Now.Ticks;
-			File.Copy(Globals.RunFilePath, tempFileName);
-			Run currentRun = JsonConvert.DeserializeObject<Run>(File.ReadAllText(tempFileName));
-			File.Delete(tempFileName);
+			Run currentRun = null;
+			try {
+				currentRun = JsonConvert.DeserializeObject<Run>(File.ReadAllText(Globals.RunFilePath));
+			} catch(IOException) {
+				return;
+			}
+
+			isSaveAlreadyDone = true;
+			Task.Run(() => ResetSaveTimer(5000));
 
 			string lastLevel = "PrisonStart";
 			if(currentRun.levels.Length > 0) {

@@ -31,7 +31,7 @@ namespace DeadCellsStats {
 		public List<IList<object>> GetValues(Stats savedStats) {
 			return new List<IList<object>> {
 				new List<object>() { "=LEFT(\"" + this.build + "\", 8)" },
-				new List<object>() { this.gameSeed },
+				new List<object>() { savedStats.gameSeed },
 				new List<object>() { this.date.ToShortDateString() },
 				new List<object>() { this.cells - savedStats.cells },
 				new List<object>() { this.gold - savedStats.gold },
