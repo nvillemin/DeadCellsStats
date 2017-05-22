@@ -125,14 +125,15 @@ namespace DeadCellsStats {
 		static void SaveStats(Run currentRun, string lastLevel) {
 			Console.WriteLine("Entering fight zone, saving stats...");
 
+			if(lastLevel.Equals(Globals.FightZones.First())) {
+				Task.Run(() => SaveStartingGold(false));
+				Thread.Sleep(500);
+			}
+
 			savedStats = new Stats(currentRun, gameProcess);
 			savedStats.PrintValues();
 
 			Console.WriteLine("Stats saved successfully!");
-
-			if(lastLevel.Equals(Globals.FightZones.First())) {
-				Task.Run(() => SaveStartingGold(false));
-			}
 		}
 
 		// Upload the stats to the google doc
