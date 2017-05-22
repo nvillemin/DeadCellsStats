@@ -99,7 +99,11 @@ namespace DeadCellsStats {
 			if(Globals.FightZones.Contains(lastLevel)) {
 				SaveStats(currentRun);
 			} else if(Globals.SafeZones.Contains(lastLevel)) {
-				UploadStats(currentRun);
+				if(savedStats != null) {
+					UploadStats(currentRun);
+				} else {
+					Console.WriteLine("No stats saved, can't save this zone.");
+				}
 			} else {
 				Console.WriteLine("Error: Unknown zone!");
 			}
