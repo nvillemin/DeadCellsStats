@@ -19,6 +19,7 @@ namespace DeadCellsStats {
 		static SheetsService service;
 		static FileSystemWatcher fileWatcher;
 		static Stats savedStats;
+		static bool isSaveAlreadyDone = false;
 
 		static void Main(string[] args) {
 			Process[] processes = Process.GetProcessesByName(Globals.ProcessName);
@@ -89,28 +90,38 @@ namespace DeadCellsStats {
 
 		// Called when the 'run.dat' file is modified (new zone)
 		static void OnChanged(object sender, FileSystemEventArgs e) {
+			if(isSaveAlreadyDone) {
+				return;
+			} else {
+				isSaveAlreadyDone = true;
+				Task.Run(() => ResetSaveTimer(5000));
+			}
+
 			string tempFileName = Globals.RunFilePath + DateTime.Now.Ticks;
 			File.Copy(Globals.RunFilePath, tempFileName);
 			Run currentRun = JsonConvert.DeserializeObject<Run>(File.ReadAllText(tempFileName));
 			File.Delete(tempFileName);
 
-			string lastLevel = currentRun.levels.Last().id;
+			string lastLevel = "PrisonStart";
+			if(currentRun.levels.Length > 0) {
+				lastLevel = currentRun.levels.Last().id;
+			}
 
 			if(Globals.FightZones.Contains(lastLevel)) {
-				SaveStats(currentRun);
+				SaveStats(currentRun, lastLevel);
 			} else if(Globals.SafeZones.Contains(lastLevel)) {
 				if(savedStats != null) {
 					UploadStats(currentRun);
 				} else {
-					Console.WriteLine("No stats saved, can't save this zone.");
+					Console.WriteLine("Safe zone entered but nothing saved so no upload.");
 				}
 			} else {
-				Console.WriteLine("Error: Unknown zone!");
+				Console.WriteLine("Error: Unknown zone! (" + lastLevel + ")");
 			}
 		}
 
 		// Save the stats at the beginning of the zone to compare them later at the end
-		static void SaveStats(Run currentRun) {
+		static void SaveStats(Run currentRun, string lastLevel) {
 			Console.WriteLine("Entering fight zone, saving stats...");
 
 			savedStats = new Stats(currentRun, gameProcess);
@@ -118,7 +129,7 @@ namespace DeadCellsStats {
 
 			Console.WriteLine("Stats saved successfully!");
 
-			if(currentRun.levels.Last().id.Equals(Globals.FightZones.First())) {
+			if(lastLevel.Equals(Globals.FightZones.First())) {
 				Task.Run(() => SaveStartingGold(false));
 			}
 		}
@@ -149,21 +160,28 @@ namespace DeadCellsStats {
 			SpreadsheetsResource.ValuesResource.UpdateRequest update = service.Spreadsheets.Values.Update(valueRange, Globals.SpreadsheetId, updateRange);
 			update.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
 			UpdateValuesResponse result = update.Execute();
+			savedStats = null;
 
 			Console.WriteLine("Stats saved to Google Doc!");
 		}
 
-		// Save the starting gold in the first level, 10s after the beginning or manually if needed
+		// Save the starting gold in the first level, 5s after the beginning or manually if needed
 		static void SaveStartingGold(bool manual) {
 			if(!manual) {
-				Console.WriteLine("First level detected, saving gold in 10s...");
-				Thread.Sleep(10000);
+				Console.WriteLine("First level detected, saving gold in 5s...");
+				Thread.Sleep(5000);
 			}
 
 			int newGold = savedStats.UpdateGoldValue(gameProcess);
 
 			Console.WriteLine("Gold value saved! (" + newGold + ")");
 			Console.WriteLine("Press \'g\' to save it manually if needed.");
+		}
+
+		// Prevent saving multiple times when run.dat changes several times when entering a safe zone
+		static void ResetSaveTimer(int ms) {
+			Thread.Sleep(ms);
+			isSaveAlreadyDone = false;
 		}
 
 		// Get the google doc cell where data should be written
