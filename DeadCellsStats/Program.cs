@@ -18,7 +18,6 @@ namespace DeadCellsStats {
 		static Process gameProcess;
 		static SheetsService service;
 		static FileSystemWatcher fileWatcher;
-		static bool fileJustCreated = false;
 		static Stats savedStats;
 
 		static void Main(string[] args) {
@@ -44,8 +43,6 @@ namespace DeadCellsStats {
 					CancellationToken.None,
 					new FileDataStore(credPath, true)).Result;
 
-				Console.WriteLine("Credential file saved to: " + credPath);
-
 				// Create Google Sheets API service
 				service = new SheetsService(new BaseClientService.Initializer() {
 					HttpClientInitializer = credential,
@@ -64,14 +61,14 @@ namespace DeadCellsStats {
 			fileWatcher.Deleted += new FileSystemEventHandler(OnDeleted);
 			fileWatcher.EnableRaisingEvents = true;
 
+			Console.WriteLine("DEAD CELLS STATS");
+
 			// Wait for the user to quit the program
 			Console.WriteLine("Press \'q\' to quit the program.");
-			while(Console.Read() != 'q');
-
 			while(true) {
 				int input = Console.Read();
 
-				if(input == 'g') {
+				if(input == 'g' && savedStats != null) {
 					SaveStartingGold(true);
 				} else if(input == 'q') {
 					return;
@@ -88,17 +85,15 @@ namespace DeadCellsStats {
 		// Called when the 'run.dat' file is created
 		static void OnCreated(object sender, FileSystemEventArgs e) {
 			Console.WriteLine("Run started!");
-			fileJustCreated = true;
 		}
 
 		// Called when the 'run.dat' file is modified (new zone)
 		static void OnChanged(object sender, FileSystemEventArgs e) {
-			if(fileJustCreated) {
-				fileJustCreated = false;
-				return;
-			}
+			string tempFileName = Globals.RunFilePath + DateTime.Now.Ticks;
+			File.Copy(Globals.RunFilePath, tempFileName);
+			Run currentRun = JsonConvert.DeserializeObject<Run>(File.ReadAllText(tempFileName));
+			File.Delete(tempFileName);
 
-			Run currentRun = JsonConvert.DeserializeObject<Run>(File.ReadAllText(Globals.RunFilePath));
 			string lastLevel = currentRun.levels.Last().id;
 
 			if(Globals.FightZones.Contains(lastLevel)) {
