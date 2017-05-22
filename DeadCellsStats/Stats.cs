@@ -23,15 +23,20 @@ namespace DeadCellsStats {
 			this.statsGained = weaponsLevel + skillsLevel + healthLevel;
 		}
 
-		public List<IList<object>> GetValues() {
+		public int UpdateGoldValue(Process gameProcess) {
+			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+			return this.gold;
+		}
+
+		public List<IList<object>> GetValues(Stats savedStats) {
 			return new List<IList<object>> {
 				new List<object>() { "=LEFT(\"" + this.build + "\", 8)" },
 				new List<object>() { this.gameSeed },
 				new List<object>() { this.date.ToShortDateString() },
-				new List<object>() { this.cells },
-				new List<object>() { this.gold },
-				new List<object>() { this.statsGained },
-				new List<object>() { this.time }
+				new List<object>() { this.cells - savedStats.cells },
+				new List<object>() { this.gold - savedStats.gold },
+				new List<object>() { this.statsGained - savedStats.statsGained },
+				new List<object>() { this.time - savedStats.time }
 			};
 		}
 
@@ -43,6 +48,16 @@ namespace DeadCellsStats {
 			Console.WriteLine("GOLD  : " + this.gold);
 			Console.WriteLine("STATS : " + this.statsGained);
 			Console.WriteLine("TIME  : " + this.time);
+		}
+
+		public void PrintValues(Stats savedStats) {
+			Console.WriteLine("BUILD : " + this.build);
+			Console.WriteLine("SEED  : " + this.gameSeed);
+			Console.WriteLine("DATE  : " + this.date.ToShortDateString());
+			Console.WriteLine("CELLS : " + (this.cells - savedStats.cells));
+			Console.WriteLine("GOLD  : " + (this.gold - savedStats.gold));
+			Console.WriteLine("STATS : " + (this.statsGained - savedStats.statsGained));
+			Console.WriteLine("TIME  : " + (this.time - savedStats.time));
 		}
 	}
 }
