@@ -28,6 +28,10 @@ namespace DeadCellsStats {
 			return this.gold;
 		}
 
+		public void AddBuyValue(int buyValue) {
+			this.gold += buyValue;
+		}
+
 		public List<IList<object>> GetValues(Stats savedStats) {
 			return new List<IList<object>> {
 				new List<object>() { "=LEFT(\"" + this.build + "\", 8)" },

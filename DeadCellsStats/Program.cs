@@ -20,6 +20,7 @@ namespace DeadCellsStats {
 		static FileSystemWatcher fileWatcher;
 		static Stats savedStats;
 		static bool isSaveAlreadyDone = false;
+		static int buyValue = 0;
 
 		static void Main(string[] args) {
 			Process[] processes = Process.GetProcessesByName(Globals.ProcessName);
@@ -67,11 +68,23 @@ namespace DeadCellsStats {
 			// Wait for the user to quit the program
 			Console.WriteLine("Press \'q\' to quit the program.");
 			while(true) {
-				int input = Console.Read();
+				string input = Console.ReadLine();
 
-				if(input == 'g' && savedStats != null) {
+				if(input.Equals("g") && savedStats != null) {
 					SaveStartingGold(true);
-				} else if(input == 'q') {
+				} else if(input.First().Equals('b')) {
+					string[] splitStr = input.Split(' ');
+					if(splitStr.Length == 2) {
+						if(splitStr.Last().Equals("r")) {
+							buyValue = 0;
+							Console.WriteLine("BuyValue reseted!");
+						}
+						buyValue += Convert.ToInt32(splitStr.Last());
+						Console.WriteLine("Bought items for " + buyValue + " gold. This amount will be added to the gold gained when uploading.");
+					} else {
+						Console.WriteLine("Failed command!");
+					}
+				} else if(input.Equals("q")) {
 					return;
 				}
 			}
@@ -119,6 +132,8 @@ namespace DeadCellsStats {
 			} else {
 				Console.WriteLine("Error: Unknown zone! (" + lastLevel + ")");
 			}
+
+			buyValue = 0;
 		}
 
 		// Save the stats at the beginning of the zone to compare them later at the end
@@ -144,6 +159,7 @@ namespace DeadCellsStats {
 			string sheetRange = GetSheetRange(levelToSave);
 
 			Stats stats = new Stats(currentRun, gameProcess);
+			stats.AddBuyValue(buyValue);
 			stats.PrintValues(savedStats);
 
 			if(sheetRange.Length == 0) {
