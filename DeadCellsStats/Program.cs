@@ -183,7 +183,7 @@ namespace DeadCellsStats {
 			string levelToSave = currentRun.levels.ElementAt(currentRun.levels.Length - 2).id;
 			string sheetRange = GetSheetRange(levelToSave);
 
-			Stats stats = new Stats(currentRun, gameProcess);
+			Stats stats = new Stats(currentRun, gameProcess, levelToSave);
 			stats.AddBuyValue(purchaseValue);
 			stats.PrintValues(savedStats);
 
