@@ -13,7 +13,7 @@ namespace DeadCellsStats {
 			this.gameSeed = currentRun.gameSeed;
 			this.date = currentRun.lastUpdate;
 
-			if(levelToSave.Equals("BeholderPit")) {
+			if(levelToSave.Equals("BoatDock")) {
 				this.cells = 30;
 			} else {
 				this.cells = Memory.ReadPointerInteger(gameProcess, Memory.CellsPointer);
