@@ -8,17 +8,11 @@ namespace DeadCellsStats {
 		int gameSeed, cells, gold, statsGained, time;
 		DateTime date;
 
-		public Stats(Run currentRun, Process gameProcess, string levelToSave) {
+		public Stats(Run currentRun, Process gameProcess) {
 			this.build = currentRun.build;
 			this.gameSeed = currentRun.gameSeed;
 			this.date = currentRun.lastUpdate;
-
-			if(levelToSave.Equals("BoatDock")) {
-				this.cells = 30;
-			} else {
-				this.cells = Memory.ReadPointerInteger(gameProcess, Memory.CellsPointer);
-			}
-			
+			this.cells = Memory.ReadPointerInteger(gameProcess, Memory.CellsPointer);
 			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
 			this.time = (int)Memory.ReadPointerDouble(gameProcess, Memory.TimePointer);
 
@@ -27,6 +21,12 @@ namespace DeadCellsStats {
 			int healthLevel = Memory.ReadPointerInteger(gameProcess, Memory.HealthLvlPointer);
 
 			this.statsGained = weaponsLevel + skillsLevel + healthLevel;
+		}
+
+		public Stats(Run currentRun, Process gameProcess, string levelToSave) : this(currentRun, gameProcess) {
+			if(levelToSave.Equals("BeholderPit")) {
+				this.cells = 30;
+			}
 		}
 
 		public int UpdateGoldValue(Process gameProcess) {

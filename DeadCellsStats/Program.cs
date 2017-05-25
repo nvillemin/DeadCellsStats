@@ -173,7 +173,7 @@ namespace DeadCellsStats {
 				Thread.Sleep(500);
 			}
 
-			savedStats = new Stats(currentRun, gameProcess, lastLevel);
+			savedStats = new Stats(currentRun, gameProcess);
 			savedStats.PrintValues();
 
 			Console.WriteLine("Stats saved successfully!");
