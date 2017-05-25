@@ -19,8 +19,8 @@ namespace DeadCellsStats {
 		static SheetsService service;
 		static FileSystemWatcher fileWatcher;
 		static Stats savedStats;
-		static bool isSaveAlreadyDone = false;
-		static int buyValue = 0;
+		static bool isSaveAlreadyDone = false, stopThread = false;
+		static int purchaseValue = 0, goldBeforePurchase = 0;
 
 		static void Main(string[] args) {
 			Process[] processes = Process.GetProcessesByName(Globals.ProcessName);
@@ -65,6 +65,9 @@ namespace DeadCellsStats {
 
 			Console.WriteLine("DEAD CELLS STATS");
 
+			Thread controllerThread = new Thread(new ThreadStart(ControllerCheck));
+			controllerThread.Start();
+
 			// Wait for the user to quit the program
 			Console.WriteLine("Press \'q\' to quit the program.");
 			while(true) {
@@ -76,17 +79,39 @@ namespace DeadCellsStats {
 					string[] splitStr = input.Split(' ');
 					if(splitStr.Length == 2) {
 						if(splitStr.Last().Equals("r")) {
-							buyValue = 0;
+							purchaseValue = 0;
 							Console.WriteLine("BuyValue reseted!");
 						}
-						buyValue += Convert.ToInt32(splitStr.Last());
-						Console.WriteLine("Bought items for " + buyValue + " gold. This amount will be added to the gold gained when uploading.");
+						purchaseValue += Convert.ToInt32(splitStr.Last());
+						Console.WriteLine("Bought items for " + purchaseValue + " gold. This amount will be added to the gold gained when uploading.");
 					} else {
 						Console.WriteLine("Failed command!");
 					}
 				} else if(input.Equals("q")) {
+					stopThread = true;
 					return;
 				}
+			}
+		}
+
+		static void ControllerCheck() {
+			Controller.XInputState controllerState = new Controller.XInputState();
+
+			while(true && !stopThread) {
+				Controller.XInputGetState(0, ref controllerState);
+
+				if(controllerState.Gamepad.IsButtonPressed(0x0001) && goldBeforePurchase > 0) {
+					int goldAfterPurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+					purchaseValue += goldBeforePurchase - goldAfterPurchase;
+					goldBeforePurchase = 0;
+					Console.WriteLine("Gold after purchase = " + goldAfterPurchase);
+					Console.WriteLine("Total purchased value = " + purchaseValue);
+				} else if(controllerState.Gamepad.IsButtonPressed(0x0002)) {
+					goldBeforePurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+					Console.WriteLine("Gold before purchase = " + goldBeforePurchase);
+				}
+
+				Thread.Sleep(200);
 			}
 		}
 
@@ -133,7 +158,7 @@ namespace DeadCellsStats {
 				Console.WriteLine("Error: Unknown zone! (" + lastLevel + ")");
 			}
 
-			buyValue = 0;
+			purchaseValue = 0;
 		}
 
 		// Save the stats at the beginning of the zone to compare them later at the end
@@ -159,7 +184,7 @@ namespace DeadCellsStats {
 			string sheetRange = GetSheetRange(levelToSave);
 
 			Stats stats = new Stats(currentRun, gameProcess);
-			stats.AddBuyValue(buyValue);
+			stats.AddBuyValue(purchaseValue);
 			stats.PrintValues(savedStats);
 
 			if(sheetRange.Length == 0) {

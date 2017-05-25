@@ -75,6 +75,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller.cs" />
     <Compile Include="GcStats.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Level.cs" />

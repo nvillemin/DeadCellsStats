@@ -11,6 +11,6 @@ namespace DeadCellsStats {
 		public static string[] FightZones = { "PrisonStart", "PrisonCourtyard", "SewerShort", "Ossuary", "PrisonRoof",
 			"SewerDepths", "PrisonDepths", "Bridge", "StiltVillage", "Cemetery", "BeholderPit" };
 		public static string[] SafeZones = { "T_Courtyard", "T_SewerShort", "T_Ossuary", "T_Roof",
-			"T_SewerDepths", "T_PrisonDepths", "T_Bridge", "T_StiltVillage", "T_Cemetery", "T_BeholderPit" };
+			"T_SewerDepths", "T_PrisonDepths", "T_Bridge", "T_StiltVillage", "T_Cemetery", "T_BeholderPit", "BoatDock" };
 	}
 }
