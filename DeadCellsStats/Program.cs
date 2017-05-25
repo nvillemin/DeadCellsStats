@@ -94,19 +94,22 @@ namespace DeadCellsStats {
 			}
 		}
 
+		// Check for controller input, used to save the gold spent on items with DPAD
 		static void ControllerCheck() {
 			Controller.XInputState controllerState = new Controller.XInputState();
 
-			while(true && !stopThread) {
+			while(!stopThread) {
 				Controller.XInputGetState(0, ref controllerState);
 
 				if(controllerState.Gamepad.IsButtonPressed(0x0001) && goldBeforePurchase > 0) {
+					// DPAD UP
 					int goldAfterPurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
 					purchaseValue += goldBeforePurchase - goldAfterPurchase;
 					goldBeforePurchase = 0;
 					Console.WriteLine("Gold after purchase = " + goldAfterPurchase);
 					Console.WriteLine("Total purchased value = " + purchaseValue);
 				} else if(controllerState.Gamepad.IsButtonPressed(0x0002)) {
+					// DPAD DOWN
 					goldBeforePurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
 					Console.WriteLine("Gold before purchase = " + goldBeforePurchase);
 				}
@@ -170,7 +173,7 @@ namespace DeadCellsStats {
 				Thread.Sleep(500);
 			}
 
-			savedStats = new Stats(currentRun, gameProcess);
+			savedStats = new Stats(currentRun, gameProcess, lastLevel);
 			savedStats.PrintValues();
 
 			Console.WriteLine("Stats saved successfully!");
