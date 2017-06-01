@@ -103,14 +103,14 @@ namespace DeadCellsStats {
 
 				if(controllerState.Gamepad.IsButtonPressed(0x0001) && goldBeforePurchase > 0) {
 					// DPAD UP
-					int goldAfterPurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+					int goldAfterPurchase = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(savedStats.build, Memory.PointerType.Gold));
 					purchaseValue += goldBeforePurchase - goldAfterPurchase;
 					goldBeforePurchase = 0;
 					Console.WriteLine("Gold after purchase = " + goldAfterPurchase);
 					Console.WriteLine("Total purchased value = " + purchaseValue);
 				} else if(controllerState.Gamepad.IsButtonPressed(0x0002)) {
 					// DPAD DOWN
-					goldBeforePurchase = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+					goldBeforePurchase = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(savedStats.build, Memory.PointerType.Gold));
 					Console.WriteLine("Gold before purchase = " + goldBeforePurchase);
 				}
 
@@ -184,18 +184,19 @@ namespace DeadCellsStats {
 			Console.WriteLine("Entering safe zone, uploading stats...");
 
 			string levelToSave = currentRun.levels.ElementAt(currentRun.levels.Length - 2).id;
-			string sheetRange = GetSheetRange(levelToSave);
 
 			Stats stats = new Stats(currentRun, gameProcess, levelToSave);
 			stats.AddBuyValue(purchaseValue);
 			stats.PrintValues(savedStats);
 
+			string tabName = stats.build.Substring(0, 8);
+			string sheetRange = GetSheetRange(levelToSave, tabName);
 			if(sheetRange.Length == 0) {
 				LocalSave(stats);
 				return;
 			}
 
-			string updateRange = Globals.Range + '!' + sheetRange;
+			string updateRange = tabName + '!' + sheetRange;
 			Console.WriteLine("Saving run in " + updateRange + "...");
 
 			ValueRange valueRange = new ValueRange();
@@ -231,8 +232,8 @@ namespace DeadCellsStats {
 		}
 
 		// Get the google doc cell where data should be written
-		static string GetSheetRange(string levelToSave) {
-			SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(Globals.SpreadsheetId, Globals.Range);
+		static string GetSheetRange(string levelToSave, string tabName) {
+			SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(Globals.SpreadsheetId, "'" + tabName + "'");
 			ValueRange response = request.Execute();
 			IList<IList<object>> values = response.Values;
 

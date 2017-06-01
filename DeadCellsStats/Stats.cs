@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace DeadCellsStats {
 	class Stats {
-		string build;
+		public string build { get; private set; }
 		int gameSeed, cells, gold, statsGained, time;
 		DateTime date;
 
@@ -12,13 +12,13 @@ namespace DeadCellsStats {
 			this.build = currentRun.build;
 			this.gameSeed = currentRun.gameSeed;
 			this.date = currentRun.lastUpdate;
-			this.cells = Memory.ReadPointerInteger(gameProcess, Memory.CellsPointer);
-			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
-			this.time = (int)Memory.ReadPointerDouble(gameProcess, Memory.TimePointer);
+			this.cells = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Cells));
+			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Gold));
+			this.time = (int)Memory.ReadPointerDouble(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Time));
 
-			int weaponsLevel = Memory.ReadPointerInteger(gameProcess, Memory.WeaponsLvlPointer);
-			int skillsLevel = Memory.ReadPointerInteger(gameProcess, Memory.SkillsLvlPointer);
-			int healthLevel = Memory.ReadPointerInteger(gameProcess, Memory.HealthLvlPointer);
+			int weaponsLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.WeaponsLvl));
+			int skillsLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.SkillsLvl));
+			int healthLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.HealthLvl));
 
 			this.statsGained = weaponsLevel + skillsLevel + healthLevel;
 		}
@@ -30,7 +30,7 @@ namespace DeadCellsStats {
 		}
 
 		public int UpdateGoldValue(Process gameProcess) {
-			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GoldPointer);
+			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Gold));
 			return this.gold;
 		}
 
@@ -40,7 +40,6 @@ namespace DeadCellsStats {
 
 		public List<IList<object>> GetValues(Stats savedStats) {
 			return new List<IList<object>> {
-				new List<object>() { "=LEFT(\"" + this.build + "\", 8)" },
 				new List<object>() { savedStats.gameSeed },
 				new List<object>() { this.date.ToShortDateString() },
 				new List<object>() { this.cells - savedStats.cells },

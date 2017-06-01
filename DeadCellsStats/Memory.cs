@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace DeadCellsStats {
@@ -14,12 +16,23 @@ namespace DeadCellsStats {
 		[DllImport("kernel32")]
 		static extern int CloseHandle(int handle);
 
-		public static Pointer CellsPointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0x2E0 });
-		public static Pointer GoldPointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x5C, 0x38 });
-		public static Pointer TimePointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x5C, 0x20 });
-		public static Pointer WeaponsLvlPointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xE8 });
-		public static Pointer SkillsLvlPointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xE4 });
-		public static Pointer HealthLvlPointer = new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xEC });
+		public enum PointerType { Cells, Gold, Time, WeaponsLvl, SkillsLvl, HealthLvl };
+
+		static Dictionary<Tuple<string, PointerType>, Pointer> Pointers = new Dictionary<Tuple<string, PointerType>, Pointer>() {
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.Cells),		new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0x2E0 }) },
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.Gold),			new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x5C, 0x38 }) },
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.Time),			new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x5C, 0x20 }) },
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.WeaponsLvl),	new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xE8 }) },
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.SkillsLvl),	new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xE4 }) },
+			{ new Tuple<string, PointerType>("d00e278c", PointerType.HealthLvl),	new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xEC }) },
+
+			{ new Tuple<string, PointerType>("a1312840", PointerType.Cells),		new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0x2E8 }) },
+			{ new Tuple<string, PointerType>("a1312840", PointerType.Gold),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x38 }) },
+			{ new Tuple<string, PointerType>("a1312840", PointerType.Time),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x20 }) },
+			{ new Tuple<string, PointerType>("a1312840", PointerType.WeaponsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF0 }) },
+			{ new Tuple<string, PointerType>("a1312840", PointerType.SkillsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF4 }) },
+			{ new Tuple<string, PointerType>("a1312840", PointerType.HealthLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF8 }) },
+		};
 
 		public static int ReadPointerInteger(Process gameProcess, Pointer pointer) {
 			int value = -1;
@@ -57,6 +70,10 @@ namespace DeadCellsStats {
 			}
 
 			return value;
+		}
+
+		public static Pointer GetPointer(string build, PointerType pointerType) {
+			return Pointers[new Tuple<string, PointerType>(build.Substring(0, 8), pointerType)];
 		}
 	}
 }
