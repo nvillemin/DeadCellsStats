@@ -26,12 +26,12 @@ namespace DeadCellsStats {
 			{ new Tuple<string, PointerType>("d00e278c", PointerType.SkillsLvl),	new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xE4 }) },
 			{ new Tuple<string, PointerType>("d00e278c", PointerType.HealthLvl),	new Pointer(0x00011880, new int[5] { 0x13C, 0x3E4, 0x18, 0x68, 0xEC }) },
 
-			{ new Tuple<string, PointerType>("a1312840", PointerType.Cells),		new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0x2E8 }) },
-			{ new Tuple<string, PointerType>("a1312840", PointerType.Gold),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x38 }) },
-			{ new Tuple<string, PointerType>("a1312840", PointerType.Time),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x20 }) },
-			{ new Tuple<string, PointerType>("a1312840", PointerType.WeaponsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF0 }) },
-			{ new Tuple<string, PointerType>("a1312840", PointerType.SkillsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF4 }) },
-			{ new Tuple<string, PointerType>("a1312840", PointerType.HealthLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF8 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.Cells),		new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0x2E8 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.Gold),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x38 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.Time),			new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x5C, 0x20 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.WeaponsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF0 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.SkillsLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF4 }) },
+			{ new Tuple<string, PointerType>("e2c7b364", PointerType.HealthLvl),	new Pointer(0x00011880, new int[5] { 0x40, 0xEC, 0x368, 0x68, 0xF8 }) },
 		};
 
 		public static int ReadPointerInteger(Process gameProcess, Pointer pointer) {

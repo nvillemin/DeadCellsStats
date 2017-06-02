@@ -25,7 +25,11 @@ namespace DeadCellsStats {
 
 		public Stats(Run currentRun, Process gameProcess, string levelToSave) : this(currentRun, gameProcess) {
 			if(levelToSave.Equals("BeholderPit")) {
-				this.cells = 30;
+				if(this.build.Substring(0, 8).Equals("d00e278c")) {
+					this.cells = 30;
+				} else {
+					this.cells = 20;
+				}
 			}
 		}
 
