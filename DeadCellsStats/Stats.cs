@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace DeadCellsStats {
 	class Stats {
 		public string build { get; private set; }
-		int gameSeed, cells, gold, statsGained, time;
+		int gameSeed, cells, gold, time;
 		DateTime date;
 
 		public Stats(Run currentRun, Process gameProcess) {
@@ -15,12 +15,6 @@ namespace DeadCellsStats {
 			this.cells = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Cells));
 			this.gold = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Gold));
 			this.time = (int)Memory.ReadPointerDouble(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.Time));
-
-			int weaponsLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.WeaponsLvl));
-			int skillsLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.SkillsLvl));
-			int healthLevel = Memory.ReadPointerInteger(gameProcess, Memory.GetPointer(this.build, Memory.PointerType.HealthLvl));
-
-			this.statsGained = weaponsLevel + skillsLevel + healthLevel;
 		}
 
 		public Stats(Run currentRun, Process gameProcess, string levelToSave) : this(currentRun, gameProcess) {
@@ -48,7 +42,6 @@ namespace DeadCellsStats {
 				new List<object>() { this.date.ToShortDateString() },
 				new List<object>() { this.cells - savedStats.cells },
 				new List<object>() { this.gold - savedStats.gold },
-				new List<object>() { this.statsGained - savedStats.statsGained },
 				new List<object>() { this.time - savedStats.time }
 			};
 		}
@@ -59,7 +52,6 @@ namespace DeadCellsStats {
 			Console.WriteLine("DATE  : " + this.date.ToShortDateString());
 			Console.WriteLine("CELLS : " + this.cells);
 			Console.WriteLine("GOLD  : " + this.gold);
-			Console.WriteLine("STATS : " + this.statsGained);
 			Console.WriteLine("TIME  : " + this.time);
 		}
 
@@ -69,7 +61,6 @@ namespace DeadCellsStats {
 			Console.WriteLine("DATE  : " + this.date.ToShortDateString());
 			Console.WriteLine("CELLS : " + (this.cells - savedStats.cells));
 			Console.WriteLine("GOLD  : " + (this.gold - savedStats.gold));
-			Console.WriteLine("STATS : " + (this.statsGained - savedStats.statsGained));
 			Console.WriteLine("TIME  : " + (this.time - savedStats.time));
 		}
 	}
